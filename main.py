@@ -12,32 +12,49 @@ class ZomatoAPI:
         "https": "https://bloombecg:Dnpd1234@hkproxy01.int.clsa.com:8080/",
     }
 
-    def searchquery(self, search_str,start ):
-        retval = requests.get(self.baseurl +'/search?entity_id=3&entity_type=city&q=' + search_str + '&start=' + start.__str__(), headers=self.headers , proxies = self.proxyDict , verify = False).content
+
+
+    def searchquery(self,search_str,start, proxy=False):
+        if(proxy):
+            retval = (requests.get(
+                self.baseurl + '/search?entity_id=3&entity_type=city&q=' + search_str + '&start=' + start.__str__(),
+                                  headers=self.headers, proxies=self.proxyDict, verify=False).content).decode('utf-8')
+        else:
+            retval = (requests.get(
+                self.baseurl + '/search?entity_id=3&entity_type=city&q=' + search_str + '&start=' + start.__str__(),
+                headers=self.headers, verify=False).content).decode('utf-8')
+
         print(self.baseurl +'/search?q=' + search_str)
         retvaljson = json.loads(retval)
         return retvaljson
 
     def jsonTodf(self, jsonObj):
         df = pd.DataFrame()
-        for i in range(1,jsonObj['restaurants'].__len__()):
-            #General info
-            id = jsonObj['restaurants'][i]['restaurant']['id']
-            name = jsonObj['restaurants'][i]['restaurant']['name']
-            cuisines = jsonObj['restaurants'][i]['restaurant']['cuisines']
-            average_cost_for_two = jsonObj['restaurants'][i]['restaurant']['average_cost_for_two']
-            
-            #Location info
-            locality = jsonObj['restaurants'][i]['restaurant']['location']['locality']
-            locality_verbose = jsonObj['restaurants'][i]['restaurant']['location']['locality_verbose']
-            address = jsonObj['restaurants'][i]['restaurant']['location']['address']
-            
-            #Rating Info
-            aggregate_rating = jsonObj['restaurants'][i]['restaurant']['price_range']
-            votes = jsonObj['restaurants'][i]['restaurant']['price_range']
-            price_range = jsonObj['restaurants'][i]['restaurant']['price_range']
-            price_range = jsonObj['restaurants'][i]['restaurant']['price_range']
-            price_range = jsonObj['restaurants'][i]['restaurant']['price_range']
+        for i in range(0,jsonObj['restaurants'].__len__()):
+            rest_object = jsonObj['restaurants'][i]['restaurant']
 
-            restData = pd.DataFrame({  })
+            #General info
+            id = rest_object['id']
+            name = rest_object['name']
+            cuisines = rest_object['cuisines']
+            average_cost_for_two = rest_object['average_cost_for_two']
+            price_range = rest_object['price_range']
+
+            #Location info
+            locality = rest_object['location']['locality']
+            locality_verbose = rest_object['location']['locality_verbose']
+            address = rest_object['location']['address']
+            latitude = rest_object['location']['longitude']
+            longitude = rest_object['location']['latitude']
+
+            #Rating Info
+            aggregate_rating = rest_object['user_rating']['aggregate_rating']
+            votes = rest_object['user_rating']['votes']
+
+            df = df.append(pd.DataFrame({'id' : id , 'name' : name , 'cuisines' : cuisines , 'average_cost_for_two' :average_cost_for_two ,
+                                      'price_range': price_range , 'locality' : locality , 'locality_verbose' : locality_verbose,
+                                      'address' : address , 'latitude' : latitude , 'longitude' : longitude , 'aggregate_rating' : aggregate_rating,
+                                      'votes' : votes},index=[0]))
+
+        return df
 
