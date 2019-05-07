@@ -58,3 +58,12 @@ class ZomatoAPI:
 
         return df
 
+
+
+
+query_meta_data = pd.DataFrame()
+zmt = ZomatoAPI()
+for areaName in zipCodes['Location']:
+    resJson = zmt.searchquery(areaName , start=0 , proxy=False )
+    query_meta_data = query_meta_data.append(pd.DataFrame( { 'areaName' : areaName , 'numResults': resJson['results_found']}, index=[0]))
+
