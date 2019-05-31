@@ -54,16 +54,15 @@ class ZomatoAPI:
             df = df.append(pd.DataFrame({'id' : id , 'name' : name , 'cuisines' : cuisines , 'average_cost_for_two' :average_cost_for_two ,
                                       'price_range': price_range , 'locality' : locality , 'locality_verbose' : locality_verbose,
                                       'address' : address , 'latitude' : latitude , 'longitude' : longitude , 'aggregate_rating' : aggregate_rating,
-                                      'votes' : votes},index=[0]))
+                                      'votes' : votes} , index = [0]),ignore_index = True)
 
         return df
 
+    def getSubAddressList(self, location_string,string_array):
+        import re as re
+        step1 = re.sub(', | ,', ',', resDf['address'], flags=re.IGNORECASE)
+        step2 = re.sub(',powai(.*)', '', step1, flags=re.IGNORECASE)
+        step3 = re.sub('(.*),', '', step2, flags=re.IGNORECASE)
 
 
-
-query_meta_data = pd.DataFrame()
-zmt = ZomatoAPI()
-for areaName in zipCodes['Location']:
-    resJson = zmt.searchquery(areaName , start=0 , proxy=False )
-    query_meta_data = query_meta_data.append(pd.DataFrame( { 'areaName' : areaName , 'numResults': resJson['results_found']}, index=[0]))
 
