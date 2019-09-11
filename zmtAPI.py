@@ -12,9 +12,19 @@ class ZomatoAPI:
         "https": "https://bloombecg:Dnpd1234@hkproxy01.int.clsa.com:8080/",
     }
 
-
-
+    nCalls = 0
+    
     def searchquery(self,search_str,start, proxy=False):
+        """
+        queries the zomato API with search_str and returns meta data and at max 20 resluts
+        
+        Parameters:
+        search_str (string)
+        start (int)
+        proxy (boolean) if connectin to internet through proxy 
+        Returns:
+        dict
+        """
         if(proxy):
             retval = (requests.get(
                 self.baseurl + '/search?entity_id=3&entity_type=city&q=' + search_str + '&start=' + start.__str__(),
@@ -23,8 +33,8 @@ class ZomatoAPI:
             retval = (requests.get(
                 self.baseurl + '/search?entity_id=3&entity_type=city&q=' + search_str + '&start=' + start.__str__(),
                 headers=self.headers, verify=False).content).decode('utf-8')
-
-        print(self.baseurl +'/search?q=' + search_str)
+        nCalls += 1
+        #print(self.baseurl +'/search?q=' + search_str)
         retvaljson = json.loads(retval)
         return retvaljson
 
@@ -57,12 +67,6 @@ class ZomatoAPI:
                                       'votes' : votes} , index = [0]),ignore_index = True)
 
         return df
-
-    def getSubAddressList(self, location_string,string_array):
-        import re as re
-        step1 = re.sub(', | ,', ',', resDf['address'], flags=re.IGNORECASE)
-        step2 = re.sub(',powai(.*)', '', step1, flags=re.IGNORECASE)
-        step3 = re.sub('(.*),', '', step2, flags=re.IGNORECASE)
 
 
 
