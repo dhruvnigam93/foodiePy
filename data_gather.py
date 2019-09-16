@@ -1,10 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Sep 10 11:38:52 2019
 
-@author: dhruv
-"""
 
 import pandas as pd
 from zmtAPI import *
@@ -13,9 +7,9 @@ def getRestaurantDetails(zmt_api , locality):
     retDf = pd.DataFrame()
     for i in range(0,100,20):
         ret= zmt.searchquery(locality,i)
-        if len(ret['restaurants'])==0 :
-        temp =zmt.jsonTodf(ret)
-        retDf = retDf.append(temp)
+        if len(ret['restaurants'])!=0 : # non empty serch result
+            temp =zmt.jsonTodf(ret)
+            retDf = retDf.append(temp)
     return retDf
         
 
@@ -32,20 +26,24 @@ def getSubLocalities(address_list , locality , n_most_common):
 
 mumbai_localitiy = pd.read_csv('zipCodesMumbai.csv')
 zmt = ZomatoAPI()
+
 #totalRestaurantes = zmt.searchquery('mumbai',0)
 #totalRestaurantes = totalRestaurantes['results_found']
 all_restaurants = pd.DataFrame()
-
+nRest = 0
 for locality in mumbai_localitiy['Location']:
+    
     print('started for locality' ,locality )
     retDf_locality = getRestaurantDetails(zmt , locality)
     if len(retDf_locality)==0 :
         continue
     all_restaurants = pd.concat([all_restaurants,retDf_locality]).drop_duplicates().reset_index(drop=True)
+
     sub_localities = getSubLocalities(retDf_locality['address'] , locality , 10)
     for sub_locality in sub_localities :
         print('in locality ' ,locality , ' searching for ' ,  sub_locality )
         retDf_sub_locality = getRestaurantDetails(zmt , locality)
         all_restaurants = pd.concat([all_restaurants,retDf_sub_locality]).drop_duplicates().reset_index(drop=True)
-
+    print( all_restaurants.shape[0] - nRest , " restaurants added for locality ", locality )
+    nRest = all_restaurants.shape[0]
 

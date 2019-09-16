@@ -24,7 +24,12 @@ class ZomatoAPI:
         proxy (boolean) if connectin to internet through proxy 
         Returns:
         dict
-        """
+        """ 
+        
+        self.nCalls += 1
+        
+        assert self.nCalls < 950 , "Halted at current search due to hitting API threshold" + search_str
+            
         if(proxy):
             retval = (requests.get(
                 self.baseurl + '/search?entity_id=3&entity_type=city&q=' + search_str + '&start=' + start.__str__(),
@@ -33,7 +38,7 @@ class ZomatoAPI:
             retval = (requests.get(
                 self.baseurl + '/search?entity_id=3&entity_type=city&q=' + search_str + '&start=' + start.__str__(),
                 headers=self.headers, verify=False).content).decode('utf-8')
-        nCalls += 1
+
         #print(self.baseurl +'/search?q=' + search_str)
         retvaljson = json.loads(retval)
         return retvaljson
@@ -49,6 +54,8 @@ class ZomatoAPI:
             cuisines = rest_object['cuisines']
             average_cost_for_two = rest_object['average_cost_for_two']
             price_range = rest_object['price_range']
+            establishment_type = ','.join(rest_object['establishment'])
+            timings = rest_object['timings']
 
             #Location info
             locality = rest_object['location']['locality']
@@ -62,8 +69,10 @@ class ZomatoAPI:
             votes = rest_object['user_rating']['votes']
 
             df = df.append(pd.DataFrame({'id' : id , 'name' : name , 'cuisines' : cuisines , 'average_cost_for_two' :average_cost_for_two ,
-                                      'price_range': price_range , 'locality' : locality , 'locality_verbose' : locality_verbose,
-                                      'address' : address , 'latitude' : latitude , 'longitude' : longitude , 'aggregate_rating' : aggregate_rating,
+                                      'price_range': price_range , 'extamblishment_type' : establishment_type , 'timings' : timings ,
+                                      'locality' : locality , 'locality_verbose' : locality_verbose,
+                                      'address' : address , 'latitude' : latitude , 'longitude' : longitude ,
+                                      'aggregate_rating' : aggregate_rating,
                                       'votes' : votes} , index = [0]),ignore_index = True)
 
         return df
