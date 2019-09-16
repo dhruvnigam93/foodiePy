@@ -29,9 +29,9 @@ zmt = ZomatoAPI()
 
 #totalRestaurantes = zmt.searchquery('mumbai',0)
 #totalRestaurantes = totalRestaurantes['results_found']
-all_restaurants = pd.DataFrame()
+#all_restaurants = pd.DataFrame()
 nRest = 0
-for locality in mumbai_localitiy['Location']:
+for locality in mumbai_localitiy['Location'][27:]:
     
     print('started for locality' ,locality )
     retDf_locality = getRestaurantDetails(zmt , locality)
@@ -46,4 +46,6 @@ for locality in mumbai_localitiy['Location']:
         all_restaurants = pd.concat([all_restaurants,retDf_sub_locality]).drop_duplicates().reset_index(drop=True)
     print( all_restaurants.shape[0] - nRest , " restaurants added for locality ", locality )
     nRest = all_restaurants.shape[0]
+
+
 
