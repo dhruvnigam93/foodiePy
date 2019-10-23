@@ -1,0 +1,16 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+
+rest_data = read.csv("/Users/dhruv/Documents/Github Projects/foodiePy/all_restaurants.csv")
+```
+
+
+```{r}
+head(rest_data)
+```
+

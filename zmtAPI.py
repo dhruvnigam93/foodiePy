@@ -1,7 +1,6 @@
 import json as json
 import pandas as pd
 import requests as requests
-zipCodes = pd.read_csv('zipcodesMumbai.csv')
 
 class ZomatoAPI:
     baseurl = 'https://developers.zomato.com/api/v2.1'
@@ -23,12 +22,12 @@ class ZomatoAPI:
         start (int)
         proxy (boolean) if connectin to internet through proxy 
         Returns:
-        dict
+        json
         """ 
         
         self.nCalls += 1
         
-        assert self.nCalls < 950 , "Halted at current search due to hitting API threshold" + search_str
+        assert self.nCalls < 950 , "Halted at current search due to hitting API threshold" + search_str # adhearing to API limits for zomato
             
         if(proxy):
             retval = (requests.get(
@@ -44,6 +43,16 @@ class ZomatoAPI:
         return retvaljson
 
     def jsonTodf(self, jsonObj):
+        """ 
+        Converts the json from Zomato to a pd df - 1 pbservation per restaurant
+        
+        Parameters:
+        search_str (string)
+        start (int)
+        proxy (boolean) if connectin to internet through proxy 
+        Returns:
+        dataframe
+        """
         df = pd.DataFrame()
         for i in range(0,jsonObj['restaurants'].__len__()):
             rest_object = jsonObj['restaurants'][i]['restaurant']
